@@ -1,12 +1,9 @@
 ﻿
 Module To_Excel
-
-
     Sub CompletaListView2(oProduct As ProductStructureTypeLib.Product,
                       oSheetListView As Microsoft.Office.Interop.Excel.Worksheet,
                       strDir As String,
-                      oDiccType3 As Dictionary(Of String, PwrProduct),
-                      includeImage As Boolean)
+                      oDiccType3 As Dictionary(Of String, PwrProduct))
 
         Dim i As Integer = 3
         Dim oShape As Microsoft.Office.Interop.Excel.Shape
@@ -33,7 +30,7 @@ Module To_Excel
                 .Cells(i, "J").Value2 = kvp.Value.Product.Nomenclature
 
                 ' Inserción de imagen
-                If includeImage AndAlso IO.File.Exists(sImgPath) Then
+                If IO.File.Exists(sImgPath) Then
                     Dim cl As Microsoft.Office.Interop.Excel.Range = .Cells(i, "K")
                     oShape = .Shapes.AddPicture(sImgPath, False, True, cl.Left + 5.5, cl.Top + 5, 90, 90)
                 End If
@@ -41,8 +38,6 @@ Module To_Excel
 
             i += 1
         Next
-
-        ' Barras de desplazamiento
         oSheetListView.Application.ActiveWindow.DisplayVerticalScrollBar = True
         oSheetListView.Application.ActiveWindow.DisplayHorizontalScrollBar = True
     End Sub
@@ -59,65 +54,6 @@ Module To_Excel
 
 
 
-    'Sub CompletaListView2(oProduct As ProductStructureTypeLib.Product,
-    '                      oSheetListView As Microsoft.Office.Interop.Excel.Worksheet,
-    '                      strDir As String,
-    '                      oDiccType3 As Dictionary(Of String, PwrProduct),
-    '                      includeImage As Boolean)
-
-    '    ' indicar que es esto
-    '    Dim sFullPathFileName As String
-
-    '    ' Indicar que es esto
-    '    Dim oShape As Microsoft.Office.Interop.Excel.Shape
-
-    '    'Completa el ListView:
-    '    Dim i As Integer = 3 'Esta linea es para ir hacia abajo en cada linea de excel
-
-    '    For Each kvp As KeyValuePair(Of String, PwrProduct) In oDiccType3
-
-    '        sFullPathFileName = strDir & "\" & kvp.Value.Product.PartNumber & ".jpg"
-
-    '        Dim ultimoFila As Integer = oDiccType3.Count + 2
-
-    '        oSheetListView.Range("A3:L" & ultimoFila).NumberFormat = "@"
-
-
-    '        ' Llena las celdas con los valores correspondientes
-    '        With oSheetListView
-    '            .Cells(i, "A") = i - 2
-    '            .Cells(i, "B") = kvp.Value.Product.PartNumber
-    '            .Cells(i, "C") = kvp.Value.ProductType
-    '            .Cells(i, "D") = kvp.Value.Product.Name
-    '            .Cells(i, "E") = kvp.Value.Product.Parent.FullName
-    '            .Cells(i, "F") = kvp.Value.Product.DescriptionRef
-    '            .Cells(i, "G") = kvp.Value.Quantity
-    '            .Cells(i, "H") = kvp.Value.Product.Source
-    '            .Cells(i, "I") = kvp.Value.Level
-    '            .Cells(i, "J") = kvp.Value.Product.Nomenclature
-
-    '        End With
-
-    '        ' Esto es para ubicar la imagen en la celda 
-    '        Dim cl As Microsoft.Office.Interop.Excel.Range = oSheetListView.Cells(i, "K")
-    '        Dim clLeft As Single = cl.Left
-    '        Dim clTop As Single = cl.Top
-
-
-    '        'inserta la imagen en la celda correspondiente
-    '        If FileIO.FileSystem.FileExists(strDir & "\" & kvp.Value.Product.PartNumber & ".jpg") Then
-    '            oShape = oSheetListView.Shapes.AddPicture(strDir & "\" & kvp.Value.Product.PartNumber & ".jpg", False, True, clLeft + 5.5, clTop + 5, 90, 90)
-    '        End If
-
-    '        i += 1    ' Siguiente línea de la hoja de trabajo
-
-    '    Next
-
-    '    ' Forzar a que Excel muestre las barras de desplazamiento
-    '    oSheetListView.Application.ActiveWindow.DisplayVerticalScrollBar = True
-    '    oSheetListView.Application.ActiveWindow.DisplayHorizontalScrollBar = True
-
-    'End Sub
 
 
 
