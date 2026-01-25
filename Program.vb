@@ -5,8 +5,12 @@ Module Program
 
     Sub Main()
 
+        Console.WriteLine(">>> Starting Export Process...")
+        Console.WriteLine("------------------------------------------------")
 
-        ' --- 1. Conexión con CATIA
+
+        ' --- 1. Conexión con CATIA 
+        ' Este programa funciona con un Product, no con un Part.
 
         ' Validación estricta del estado
         ' Comprobamos si el Status es exactamente ProductDocument
@@ -16,17 +20,23 @@ Module Program
            "Estado actual: " & session.Description, MsgBoxStyle.Critical)
             Exit Sub
         End If
-        ' Extraemos los objetos de la sesión ya validada
+
+
         Dim oAppCatia As INFITF.Application = session.Application
         oAppCatia.DisplayFileAlerts = False
-        ' El CType es seguro aquí porque el Status ya confirmó que es un ProductDocument
-        Dim oProductDocument As ProductStructureTypeLib.ProductDocument = CType(oAppCatia.ActiveDocument, ProductStructureTypeLib.ProductDocument)
-        Dim oProduct As ProductStructureTypeLib.Product = oProductDocument.Product
 
-        If Not CheckSaveStatus(session.Application.ActiveDocument) Then
+        Dim oProductDocument As ProductStructureTypeLib.ProductDocument = CType(oAppCatia.ActiveDocument, ProductStructureTypeLib.ProductDocument)
+
+        If Not CheckSaveStatus(oProductDocument) Then
             MessageBox.Show("El documento actual no ha sido guardado. Guárdelo antes de continuar.", "Aviso")
             Exit Sub
         End If
+
+        ' En este punto el oProduct ya esta validado
+        Dim oProduct As ProductStructureTypeLib.Product = oProductDocument.Product
+
+
+
 
 
         ' --- 2. INICIALIZACIÓN DE EXCEL ---
@@ -42,11 +52,12 @@ Module Program
 
 
 
+
+
         ' --- 3. GESTIÓN DE DIRECTORIOS ---
         Dim baseDir As String = "C:\Temp"
         Dim timestamp As String = DateTime.Now.ToString("yyyyMMdd_HHmmss")
         Dim folderPath As String = IO.Path.Combine(baseDir, "Export_" & timestamp)
-
         If Not IO.Directory.Exists(folderPath) Then
             IO.Directory.CreateDirectory(folderPath)
         End If
@@ -54,27 +65,47 @@ Module Program
 
 
 
-        ' --- 4. EXTRACCIÓN Y FORMATEO ---
+
+        '**************************************************************************************
+        ' Aca estan las funcionalidades principales EXTRACCIÓN Y FORMATEO
+        '**************************************************************************************
+        'Dim oCatiaDataextractor As New CatiaDataExtractor
+        'Dim oExcelFormater As New ExcelFormatter
+        'Dim oCatiaData As Dictionary(Of String, PwrProduct)
+        'Dim excelFileName As String = IO.Path.Combine(folderPath, "Reporte_" & timestamp & ".xlsx")
+
+        'oCatiaData = oCatiaDataextractor.ExtractData(oProduct, folderPath, True)
+        'To_Excel.CompletaListView2(oProduct, oWorkSheet, folderPath, oCatiaData)
+        'oExcelFormater.FormatoListView2(oWorkSheet, oCatiaData.Count)
+        'oWorkbook.SaveAs(excelFileName)
+
+
+
+
+        '**************************************************************************************
+        ' Funcionalidades principales: EXTRACCIÓN, ESCRITURA Y FORMATEO
+        '**************************************************************************************
         Dim oCatiaDataextractor As New CatiaDataExtractor
+        Dim oExcelWriter As New ExcelDataWriter
         Dim oExcelFormater As New ExcelFormatter
         Dim oCatiaData As Dictionary(Of String, PwrProduct)
-        oCatiaData = oCatiaDataextractor.ExtractData(oProduct, folderPath, True)
-        To_Excel.CompletaListView2(oProduct, oWorkSheet, folderPath, oCatiaData)
-        oExcelFormater.FormatoListView2(oWorkSheet, oCatiaData.Count)
-
-
-
-
-
-        ' --- 5. GUARDADO ---
         Dim excelFileName As String = IO.Path.Combine(folderPath, "Reporte_" & timestamp & ".xlsx")
+
+
+        ' Paso 1: Extraer datos
+        oCatiaData = oCatiaDataextractor.ExtractData(oProduct, folderPath, True)
+
+        ' Paso 2: Escribir en Excel (Usamos el nuevo objeto oExcelWriter)
+        oExcelWriter.CompletaListView2(oProduct, oWorkSheet, folderPath, oCatiaData)
+
+        ' Paso 3: Formatear y Guardar
+        oExcelFormater.FormatoListView2(oWorkSheet, oCatiaData.Count)
         oWorkbook.SaveAs(excelFileName)
 
 
 
 
         ' --- 6. LIMPIEZA ATÓMICA DE OBJETOS COM ---
-
         ' A. Liberar objetos del diccionario (Referencias internas de CATIA)
         If oCatiaData IsNot Nothing Then
             For Each kvp In oCatiaData
@@ -90,7 +121,6 @@ Module Program
         ' B. Liberar variables de contenido de Excel (Hijos a Padres)
         ' Cerramos el libro pero NO la aplicación todavía
         If oWorkbook IsNot Nothing Then oWorkbook.Close(False)
-
         If oWorkSheet IsNot Nothing Then Runtime.InteropServices.Marshal.FinalReleaseComObject(oWorkSheet)
         If oWorkSheets IsNot Nothing Then Runtime.InteropServices.Marshal.FinalReleaseComObject(oWorkSheets)
         If oWorkbook IsNot Nothing Then Runtime.InteropServices.Marshal.FinalReleaseComObject(oWorkbook)
@@ -119,7 +149,8 @@ Module Program
         GC.Collect()
         GC.WaitForPendingFinalizers()
 
-        MsgBox("fin")
+        Console.WriteLine("-----------------------------------------------------------------")
+        Console.WriteLine(">>> Finished Successfully at " & DateTime.Now.ToString("HH:mm:ss"))
 
 
     End Sub

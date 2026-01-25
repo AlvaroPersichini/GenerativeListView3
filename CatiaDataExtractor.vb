@@ -1,9 +1,7 @@
 ﻿Option Explicit On
 Option Strict On
 
-Imports System.IO
-Imports INFITF
-Imports ProductStructureTypeLib
+
 
 'El manejo de los "Components" 
 'Los detecta y los salta: Si encuentra un "Component"
@@ -16,12 +14,17 @@ Public Class CatiaDataExtractor
     ''' <summary>
     ''' Extrae los datos de la estructura de CATIA y genera capturas de pantalla.
     ''' </summary>
-    Public Function ExtractData(oRootProduct As Product,
+    Public Function ExtractData(oRootProduct As ProductStructureTypeLib.Product,
                                 folderPath As String,
                                 takeSnaps As Boolean) As Dictionary(Of String, PwrProduct)
 
+
+        ' MENSAJE DE INICIO
+        Console.WriteLine("[" & DateTime.Now.ToString("HH:mm:ss") & "] Step 1/3: Extracting data from CATIA...")
+
+
         If takeSnaps AndAlso Not String.IsNullOrEmpty(folderPath) Then
-            If Not Directory.Exists(folderPath) Then Directory.CreateDirectory(folderPath)
+            If Not IO.Directory.Exists(folderPath) Then IO.Directory.CreateDirectory(folderPath)
         End If
 
         Dim oDictionary As New Dictionary(Of String, PwrProduct)
@@ -49,14 +52,14 @@ Public Class CatiaDataExtractor
         Return oDictionary
     End Function
 
-    Private Sub ProcesarHijosRecursivo(oParent As Product,
+    Private Sub ProcesarHijosRecursivo(oParent As ProductStructureTypeLib.Product,
                                       ByRef oDictionary As Dictionary(Of String, PwrProduct),
                                       ByVal currentLevel As Integer,
                                       folderPath As String,
                                       takeSnaps As Boolean,
                                       oParentDoc As INFITF.Document) ' <-- Recibe el Doc del Padre
 
-        For Each oChild As Product In oParent.Products
+        For Each oChild As ProductStructureTypeLib.Product In oParent.Products
             ' Obtenemos el documento al que pertenece la referencia del hijo
             Dim oChildDoc As INFITF.Document = CType(oChild.ReferenceProduct.Parent, INFITF.Document)
 
@@ -88,17 +91,17 @@ Public Class CatiaDataExtractor
                 End If
 
                 ' Si es un ensamble real, profundizamos pasando el documento del HIJO como nuevo padre
-                If TypeOf oChildDoc Is ProductDocument Then
+                If TypeOf oChildDoc Is ProductStructureTypeLib.ProductDocument Then
                     ProcesarHijosRecursivo(oChild, oDictionary, currentLevel + 1, folderPath, takeSnaps, oChildDoc)
                 End If
             End If
         Next
     End Sub
 
-    Private Function TakeSnapshot(oProd As Product, folder As String, isRoot As Boolean) As String
+    Private Function TakeSnapshot(oProd As ProductStructureTypeLib.Product, folder As String, isRoot As Boolean) As String
         ' Limpiar el nombre para evitar errores con caracteres como / o *
         Dim safePartNumber As String = CleanFileName(oProd.PartNumber)
-        Dim finalFileName As String = Path.Combine(folder, safePartNumber & ".jpg")
+        Dim finalFileName As String = IO.Path.Combine(folder, safePartNumber & ".jpg")
 
         ' Filtro para piezas auxiliares
         If Left(oProd.PartNumber, 3) = "AUX" Then Return ""
@@ -108,7 +111,7 @@ Public Class CatiaDataExtractor
 
         ' --- 1. GESTIÓN DE VENTANAS ---
         If Not isRoot Then
-            Dim oSelection As Selection = docPrincipal.Selection
+            Dim oSelection As INFITF.Selection = docPrincipal.Selection
             oSelection.Clear()
             oSelection.Add(oProd)
             oApp.StartCommand("Open in New Window")
@@ -123,8 +126,8 @@ Public Class CatiaDataExtractor
 
         ' --- 2. CONFIGURACIÓN VISUAL ---
         Dim oCurrentWindow As INFITF.Window = oApp.ActiveWindow
-        Dim oSpecsWin As SpecsAndGeomWindow = CType(oCurrentWindow, SpecsAndGeomWindow)
-        Dim oViewer As Viewer3D = CType(oSpecsWin.Viewers.Item(1), Viewer3D)
+        Dim oSpecsWin As INFITF.SpecsAndGeomWindow = CType(oCurrentWindow, INFITF.SpecsAndGeomWindow)
+        Dim oViewer As INFITF.Viewer3D = CType(oSpecsWin.Viewers.Item(1), INFITF.Viewer3D)
 
         ' Fondo Blanco
         Dim oldColor(2), white(2) As Object
@@ -133,31 +136,31 @@ Public Class CatiaDataExtractor
         oViewer.PutBackgroundColor(white)
 
         ' Interfaz y Cámara
-        oSpecsWin.Layout = CatSpecsAndGeomWindowLayout.catWindowGeomOnly
+        oSpecsWin.Layout = INFITF.CatSpecsAndGeomWindowLayout.catWindowGeomOnly
         oApp.StartCommand("Compass") ' Ocultar
 
         oCurrentWindow.Height = 300
         oCurrentWindow.Width = 300
 
         ' Aplicar Vista Isométrica (Cámara 1)
-        oViewer.Viewpoint3D = CType(oApp.ActiveDocument.Cameras.Item(1), Camera3D).Viewpoint3D
+        oViewer.Viewpoint3D = CType(oApp.ActiveDocument.Cameras.Item(1), INFITF.Camera3D).Viewpoint3D
         oViewer.Reframe()
         oViewer.Update()
         oApp.RefreshDisplay = True
 
         ' --- 3. CAPTURA ---
-        oViewer.CaptureToFile(CatCaptureFormat.catCaptureFormatJPEG, finalFileName)
+        oViewer.CaptureToFile(INFITF.CatCaptureFormat.catCaptureFormatJPEG, finalFileName)
 
         ' --- 4. RESTAURACIÓN ---
         oViewer.PutBackgroundColor(oldColor)
         oApp.StartCommand("Compass") ' Mostrar
-        oSpecsWin.Layout = CatSpecsAndGeomWindowLayout.catWindowSpecsAndGeom
+        oSpecsWin.Layout = INFITF.CatSpecsAndGeomWindowLayout.catWindowSpecsAndGeom
 
         If Not isRoot Then
             oApp.ActiveDocument.Close()
             docPrincipal.Activate()
         Else
-            oCurrentWindow.WindowState = CatWindowState.catWindowStateMaximized
+            oCurrentWindow.WindowState = INFITF.CatWindowState.catWindowStateMaximized
         End If
 
         Return finalFileName
@@ -167,7 +170,7 @@ Public Class CatiaDataExtractor
     ''' Reemplaza caracteres inválidos del PartNumber para poder guardar el archivo en Windows.
     ''' </summary>
     Private Function CleanFileName(name As String) As String
-        Dim invalidChars As String = New String(Path.GetInvalidFileNameChars())
+        Dim invalidChars As New String(IO.Path.GetInvalidFileNameChars())
         Dim cleaned As String = name
         For Each c As Char In invalidChars
             cleaned = cleaned.Replace(c, "_"c)

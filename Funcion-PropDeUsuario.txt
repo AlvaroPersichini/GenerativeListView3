@@ -1,0 +1,37 @@
+' En las cámaras pasa lo mismo que en "oCurrentWindow", ya que para poder referenciar las camaras se necesita el documento activo
+' Trabajar con la sentencia "ActiveDocuemnt" o "ActiveWindow" en un método que recibe por parámetro el oProduct tiene cierta inconsistencia,
+' ya que debería estár todo referenciado a el parámetro que ha ingresado como argumento. De todas formas, se utiliza el " oAppCATIA.Interactive = False"
+' para que el usuario no cambie el documento o ventana activa.
+
+
+' **************************************************************************************************************************
+' IMPORTANTE
+' Habria que hacer un procedimiento para comprobar que no hay "\" (backlash) en los nombres de los archivos!
+' Importante: Naming Rules:
+' Create a New product and give it a name with a backslash: "Cube2\Elementary Source".
+' Save this product And you will see that all the words before the backslash, And the backslash, are Not taken into account.
+
+
+' Dim oCamera3D As INFITF.Camera3D = oCameras.Item(1)  ' las primeras 7 camaras son de tipo "Camera3D". Camara 1 = isometrica  '(QueryInterface) (Pag.235)
+
+
+
+' Esta parte de parametros no esta bien pulida
+' Dim oUserRefParameters As KnowledgewareTypeLib.Parameters
+' ****************************************************************************
+' Propiedades de Usuario
+' (1) Material en Bruto
+' (2) Material
+' NOTA: Si se agregan propiedades de usuario, entonces hay que agregarlas acá
+' ****************************************************************************
+'oUserRefParameters = kvp.Value.Product.ReferenceProduct.UserRefProperties
+'If oUserRefParameters.Count <> 0 Then 'Primero ver si hay propiedades de usuario
+'    For Each Parametro As KnowledgewareTypeLib.Parameter In oUserRefParameters  'Luego, buscar cuales hay
+'        If Parametro.Name = "Material" Then
+'            oSheetListView.Cells(i, ListViewMaterialCol) = oUserRefParameters.Item("Material").ValueAsString()
+'        End If
+'        If Parametro.Name = "Material en Bruto" Then
+'            oSheetListView.Cells(i, ListViewMaterialenBrutoCol) = oUserRefParameters.Item("Material en Bruto").ValueAsString()
+'        End If
+'    Next
+'End If

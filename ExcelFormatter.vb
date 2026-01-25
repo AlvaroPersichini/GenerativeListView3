@@ -5,6 +5,11 @@ Public Class ExcelFormatter
 
     Sub FormatoListView2(oWorkSheetListView As Microsoft.Office.Interop.Excel.Worksheet, rows As Integer)
 
+
+        ' MENSAJE DE PROGRESO
+        Console.WriteLine("[" & DateTime.Now.ToString("HH:mm:ss") & "] Step 3/3: Formatting Excel...")
+
+
         oWorkSheetListView.Activate() : oWorkSheetListView.Name = "ListView"
 
         Dim oWorkBook As Microsoft.Office.Interop.Excel.Workbook = CType(oWorkSheetListView.Parent, Microsoft.Office.Interop.Excel.Workbook)
