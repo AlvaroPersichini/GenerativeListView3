@@ -5,10 +5,7 @@ Public Class ExcelFormatter
 
     Sub FormatoListView2(oWorkSheetListView As Microsoft.Office.Interop.Excel.Worksheet, rows As Integer)
 
-
-        ' MENSAJE DE PROGRESO
         Console.WriteLine("[" & DateTime.Now.ToString("HH:mm:ss") & "] Step 3/3: Formatting Excel...")
-
 
         oWorkSheetListView.Activate() : oWorkSheetListView.Name = "ListView"
 
@@ -29,10 +26,10 @@ Public Class ExcelFormatter
         ' // hay que modificar esto. Se pueden armar diccionarios o listas aparte y luego pasarlas como argumentos
         Dim oDicListViewColumnText As New Dictionary(Of String, String) From {
             {"A1", "#"},
-            {"B1", "PartNumber"},
-            {"C1", "ProductType"},
-            {"D1", "FileName"},
-            {"E1", "FilePath"},
+            {"B1", "CurrentDirectory"},
+            {"C1", "FileName"},
+            {"D1", "CurrentPartNumber"},
+            {"E1", "NewPartNumber"},
             {"F1", "DescriptionRef"},
             {"G1", "Quantity"},
             {"H1", "Source"},
@@ -64,22 +61,11 @@ Public Class ExcelFormatter
 
         ' Fuente, tamaño y alineado del encabezado
         With oWorkSheetListView
-
-            ' colores encabezado
-            .Range("A1").Interior.ColorIndex = 15
-
-            .Range("B1").Interior.Color = RGB(204, 255, 255)
-
-            .Range("C1", "E1").Interior.ColorIndex = 15
-
-            .Range("F1", "K1").Interior.ColorIndex = RGB(204, 255, 255)
-
+            .Range("A1", "D1").Interior.ColorIndex = 15
+            .Range("E1", "K1").Interior.Color = RGB(204, 255, 255)
             .Range("L1").Interior.Color = RGB(255, 165, 0)
-
             .Range("B1", "L1").Orientation = 90
-
             .Range("A1", "L1").Font.Bold = True
-
         End With
 
 
@@ -97,6 +83,7 @@ Public Class ExcelFormatter
             .Range("A3", "L" & rows + 2).HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignCenter
             .Range("L3", "L" & rows + 2).RowHeight = 100
             .Range("L3", "L" & rows + 2).ColumnWidth = 18
+            .Range("E3", "E" & rows + 2).ColumnWidth = 18
         End With
 
 

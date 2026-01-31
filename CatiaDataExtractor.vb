@@ -35,7 +35,7 @@ Public Class CatiaDataExtractor
             .Source = oRootProduct.Source
             .Level = 0
             .FileName = rootDoc.Name
-            .FullPath = rootDoc.FullName
+            .FullPath = GetJustDirectory(rootDoc.FullName) ' <--- MODIFICADO
             .ImageFilePath = If(takeSnaps, TakeSnapshot(oRootProduct, folderPath, True), "")
         End With
 
@@ -79,7 +79,7 @@ Public Class CatiaDataExtractor
                         .Source = oChild.Source
                         .Level = currentLevel
                         .FileName = oChildDoc.Name
-                        .FullPath = oChildDoc.FullName
+                        .FullPath = GetJustDirectory(oChildDoc.FullName)
                         .ImageFilePath = If(takeSnaps, TakeSnapshot(oChild, folderPath, False), "")
                     End With
                     oDictionary.Add(pNumber, PP)
@@ -97,11 +97,6 @@ Public Class CatiaDataExtractor
         ' Limpiar el nombre para evitar errores con caracteres como / o *
         Dim safePartNumber As String = CleanFileName(oProd.PartNumber)
         Dim finalFileName As String = IO.Path.Combine(folder, safePartNumber & ".jpg")
-
-        '-----------------------------------------------------
-        ' Filtro para piezas auxiliares
-        ' If Left(oProd.PartNumber, 3) = "AUX" Then Return ""
-        '-----------------------------------------------------
 
         Dim oApp As INFITF.Application = oProd.Application
         Dim docPrincipal As INFITF.Document = oApp.ActiveDocument
@@ -159,9 +154,9 @@ Public Class CatiaDataExtractor
         Else
             oCurrentWindow.WindowState = INFITF.CatWindowState.catWindowStateMaximized
         End If
-
         Return finalFileName
     End Function
+
 
     ''' <summary>
     ''' Reemplaza caracteres inválidos del PartNumber para poder guardar el archivo en Windows.
@@ -173,6 +168,20 @@ Public Class CatiaDataExtractor
             cleaned = cleaned.Replace(c, "_"c)
         Next
         Return cleaned
+    End Function
+
+
+    ''' <summary>
+    ''' Extrae el directorio de una ruta FullName de CATIA (Soporta Windows y DLNames).
+    ''' </summary>
+    Private Function GetJustDirectory(fullPath As String) As String
+        If String.IsNullOrEmpty(fullPath) Then Return ""
+        ' Buscamos el último separador de Windows (\) o de DLName (/)
+        Dim lastSlash As Integer = Math.Max(fullPath.LastIndexOf("\"), fullPath.LastIndexOf("/"))
+        If lastSlash > 0 Then
+            Return fullPath.Substring(0, lastSlash)
+        End If
+        Return fullPath
     End Function
 
 End Class

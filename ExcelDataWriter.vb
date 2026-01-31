@@ -13,13 +13,13 @@ Public Class ExcelDataWriter
 
         Console.WriteLine("[" & DateTime.Now.ToString("HH:mm:ss") & "] Step 2/3: Filling Excel with extracted data...")
 
-
         Dim i As Integer = 3
         Dim oShape As Microsoft.Office.Interop.Excel.Shape
 
         ' Formateo masivo de celdas como texto antes de empezar
         Dim ultimoFila As Integer = oDiccType3.Count + 2
         oSheetListView.Range("A3:L" & ultimoFila).NumberFormat = "@"
+
 
         For Each kvp As KeyValuePair(Of String, PwrProduct) In oDiccType3
 
@@ -29,10 +29,10 @@ Public Class ExcelDataWriter
             With oSheetListView
                 ' Asignación de valores con CType para cumplir con Option Strict On
                 CType(.Cells(i, "A"), Microsoft.Office.Interop.Excel.Range).Value2 = i - 2
-                CType(.Cells(i, "B"), Microsoft.Office.Interop.Excel.Range).Value2 = kvp.Value.Product.PartNumber
-                CType(.Cells(i, "C"), Microsoft.Office.Interop.Excel.Range).Value2 = kvp.Value.ProductType
-                CType(.Cells(i, "D"), Microsoft.Office.Interop.Excel.Range).Value2 = oDoc.Name
-                CType(.Cells(i, "E"), Microsoft.Office.Interop.Excel.Range).Value2 = kvp.Value.FullPath
+                CType(.Cells(i, "B"), Microsoft.Office.Interop.Excel.Range).Value2 = kvp.Value.FullPath
+                CType(.Cells(i, "C"), Microsoft.Office.Interop.Excel.Range).Value2 = kvp.Value.FileName
+                CType(.Cells(i, "D"), Microsoft.Office.Interop.Excel.Range).Value2 = kvp.Value.Product.PartNumber
+                CType(.Cells(i, "E"), Microsoft.Office.Interop.Excel.Range).Value2 = ""
                 CType(.Cells(i, "F"), Microsoft.Office.Interop.Excel.Range).Value2 = kvp.Value.Product.DescriptionRef
                 CType(.Cells(i, "G"), Microsoft.Office.Interop.Excel.Range).Value2 = kvp.Value.Quantity
                 CType(.Cells(i, "H"), Microsoft.Office.Interop.Excel.Range).Value2 = kvp.Value.Source
