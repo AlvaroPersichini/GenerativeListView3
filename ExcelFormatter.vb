@@ -17,8 +17,8 @@ Public Class ExcelFormatter
         'Está asignando el item 1 del total de todas las ventanas.
         Dim viewListView As Microsoft.Office.Interop.Excel.WorksheetView = CType(oWorkBook.Windows.Item(1).SheetViews.Item(1), Microsoft.Office.Interop.Excel.WorksheetView)
         viewListView.DisplayGridlines = False
-        Dim oRangoEncabezado As Microsoft.Office.Interop.Excel.Range = oWorkSheetListView.Range("A1", "K2")
-        Dim oRangoCuerpo As Microsoft.Office.Interop.Excel.Range = oWorkSheetListView.Range("A3", "K3")
+        Dim oRangoEncabezado As Microsoft.Office.Interop.Excel.Range = oWorkSheetListView.Range("A1", "L2")
+        Dim oRangoCuerpo As Microsoft.Office.Interop.Excel.Range = oWorkSheetListView.Range("A3", "L3")
         Dim strColumnLetter As String
         Dim oCurrentRange As Microsoft.Office.Interop.Excel.Range
         Dim a As String
@@ -38,7 +38,8 @@ Public Class ExcelFormatter
             {"H1", "Source"},
             {"I1", "Level"},
             {"J1", "Nomenclature"},
-            {"K1", "Image"}
+            {"K1", "Definition"},
+            {"L1", "Image"}
         }
         For Each kvp As KeyValuePair(Of String, String) In oDicListViewColumnText
             oWorkSheetListView.Range(kvp.Key).Value = kvp.Value
@@ -63,11 +64,22 @@ Public Class ExcelFormatter
 
         ' Fuente, tamaño y alineado del encabezado
         With oWorkSheetListView
-            .Range("B1", "K1").Orientation = 90
-            .Range("A1", "K1").Font.Bold = True
-            .Range("A1", "C1").Interior.Color = RGB(204, 255, 255)
-            .Range("D1", "K1").Interior.ColorIndex = 15
-            .Range("A2", "K2").Interior.ColorIndex = 15
+
+            ' colores encabezado
+            .Range("A1").Interior.ColorIndex = 15
+
+            .Range("B1").Interior.Color = RGB(204, 255, 255)
+
+            .Range("C1", "E1").Interior.ColorIndex = 15
+
+            .Range("F1", "K1").Interior.ColorIndex = RGB(204, 255, 255)
+
+            .Range("L1").Interior.Color = RGB(255, 165, 0)
+
+            .Range("B1", "L1").Orientation = 90
+
+            .Range("A1", "L1").Font.Bold = True
+
         End With
 
 
@@ -81,10 +93,10 @@ Public Class ExcelFormatter
 
         ' Formato aplicado a todo el cuerpo
         With oWorkSheetListView
-            .Range("A3", "K" & rows + 2).VerticalAlignment = Microsoft.Office.Interop.Excel.XlVAlign.xlVAlignCenter
-            .Range("A3", "K" & rows + 2).HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignCenter
-            .Range("M3", "K" & rows + 2).RowHeight = 100
-            .Range("M3", "K" & rows + 2).ColumnWidth = 18
+            .Range("A3", "L" & rows + 2).VerticalAlignment = Microsoft.Office.Interop.Excel.XlVAlign.xlVAlignCenter
+            .Range("A3", "L" & rows + 2).HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignCenter
+            .Range("L3", "L" & rows + 2).RowHeight = 100
+            .Range("L3", "L" & rows + 2).ColumnWidth = 18
         End With
 
 

@@ -1,8 +1,6 @@
 ﻿Option Explicit On
 Option Strict On
 
-
-
 'El manejo de los "Components" 
 'Los detecta y los salta: Si encuentra un "Component"
 '(no tienen un archivo propio y solo sirven para organizar),
@@ -18,10 +16,7 @@ Public Class CatiaDataExtractor
                                 folderPath As String,
                                 takeSnaps As Boolean) As Dictionary(Of String, PwrProduct)
 
-
-        ' MENSAJE DE INICIO
         Console.WriteLine("[" & DateTime.Now.ToString("HH:mm:ss") & "] Step 1/3: Extracting data from CATIA...")
-
 
         If takeSnaps AndAlso Not String.IsNullOrEmpty(folderPath) Then
             If Not IO.Directory.Exists(folderPath) Then IO.Directory.CreateDirectory(folderPath)
@@ -103,8 +98,10 @@ Public Class CatiaDataExtractor
         Dim safePartNumber As String = CleanFileName(oProd.PartNumber)
         Dim finalFileName As String = IO.Path.Combine(folder, safePartNumber & ".jpg")
 
+        '-----------------------------------------------------
         ' Filtro para piezas auxiliares
-        If Left(oProd.PartNumber, 3) = "AUX" Then Return ""
+        ' If Left(oProd.PartNumber, 3) = "AUX" Then Return ""
+        '-----------------------------------------------------
 
         Dim oApp As INFITF.Application = oProd.Application
         Dim docPrincipal As INFITF.Document = oApp.ActiveDocument

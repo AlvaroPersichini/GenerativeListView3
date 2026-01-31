@@ -5,13 +5,13 @@ Module Program
 
     Sub Main()
 
+
         Console.WriteLine(">>> Starting Export Process...")
         Console.WriteLine("------------------------------------------------")
 
 
-        ' --- 1. Conexión con CATIA 
+        ' --- 1. Conexión con CATIA ---
         ' Este programa funciona con un Product, no con un Part.
-
         ' Validación estricta del estado
         ' Comprobamos si el Status es exactamente ProductDocument
         Dim session As New CatiaSession()
@@ -20,18 +20,14 @@ Module Program
            "Estado actual: " & session.Description, MsgBoxStyle.Critical)
             Exit Sub
         End If
-
-
         Dim oAppCatia As INFITF.Application = session.Application
         oAppCatia.DisplayFileAlerts = False
-
         Dim oProductDocument As ProductStructureTypeLib.ProductDocument = CType(oAppCatia.ActiveDocument, ProductStructureTypeLib.ProductDocument)
-
+        ' Comprobamos si el documento está guardado
         If Not CheckSaveStatus(oProductDocument) Then
             MessageBox.Show("El documento actual no ha sido guardado. Guárdelo antes de continuar.", "Aviso")
             Exit Sub
         End If
-
         ' En este punto el oProduct ya esta validado
         Dim oProduct As ProductStructureTypeLib.Product = oProductDocument.Product
 
@@ -66,21 +62,6 @@ Module Program
 
 
 
-        '**************************************************************************************
-        ' Aca estan las funcionalidades principales EXTRACCIÓN Y FORMATEO
-        '**************************************************************************************
-        'Dim oCatiaDataextractor As New CatiaDataExtractor
-        'Dim oExcelFormater As New ExcelFormatter
-        'Dim oCatiaData As Dictionary(Of String, PwrProduct)
-        'Dim excelFileName As String = IO.Path.Combine(folderPath, "Reporte_" & timestamp & ".xlsx")
-
-        'oCatiaData = oCatiaDataextractor.ExtractData(oProduct, folderPath, True)
-        'To_Excel.CompletaListView2(oProduct, oWorkSheet, folderPath, oCatiaData)
-        'oExcelFormater.FormatoListView2(oWorkSheet, oCatiaData.Count)
-        'oWorkbook.SaveAs(excelFileName)
-
-
-
 
         '**************************************************************************************
         ' Funcionalidades principales: EXTRACCIÓN, ESCRITURA Y FORMATEO
@@ -91,7 +72,6 @@ Module Program
         Dim oCatiaData As Dictionary(Of String, PwrProduct)
         Dim excelFileName As String = IO.Path.Combine(folderPath, "Reporte_" & timestamp & ".xlsx")
 
-
         ' Paso 1: Extraer datos
         oCatiaData = oCatiaDataextractor.ExtractData(oProduct, folderPath, True)
 
@@ -101,6 +81,7 @@ Module Program
         ' Paso 3: Formatear y Guardar
         oExcelFormater.FormatoListView2(oWorkSheet, oCatiaData.Count)
         oWorkbook.SaveAs(excelFileName)
+
 
 
 
@@ -117,7 +98,6 @@ Module Program
             Next
             oCatiaData.Clear()
         End If
-
         ' B. Liberar variables de contenido de Excel (Hijos a Padres)
         ' Cerramos el libro pero NO la aplicación todavía
         If oWorkbook IsNot Nothing Then oWorkbook.Close(False)
@@ -125,32 +105,38 @@ Module Program
         If oWorkSheets IsNot Nothing Then Runtime.InteropServices.Marshal.FinalReleaseComObject(oWorkSheets)
         If oWorkbook IsNot Nothing Then Runtime.InteropServices.Marshal.FinalReleaseComObject(oWorkbook)
         If oWorkbooks IsNot Nothing Then Runtime.InteropServices.Marshal.FinalReleaseComObject(oWorkbooks)
-
         ' Ahora que todo lo demás de Excel se liberó, cerramos la App y la liberamos
         If myExcel IsNot Nothing Then
             myExcel.Quit()
             Runtime.InteropServices.Marshal.FinalReleaseComObject(myExcel)
         End If
-
         ' C. Liberar variables de contenido de CATIA
         If oProduct IsNot Nothing Then Runtime.InteropServices.Marshal.FinalReleaseComObject(oProduct)
         If oProductDocument IsNot Nothing Then Runtime.InteropServices.Marshal.FinalReleaseComObject(oProductDocument)
-
         ' D. Restaurar interfaz y liberar la App de CATIA
         If oAppCatia IsNot Nothing Then
             oAppCatia.Interactive = True
             oAppCatia.DisplayFileAlerts = True
             Runtime.InteropServices.Marshal.FinalReleaseComObject(oAppCatia)
         End If
-
         ' E. Forzar al Garbage Collector
         GC.Collect()
         GC.WaitForPendingFinalizers()
         GC.Collect()
         GC.WaitForPendingFinalizers()
 
+
+
+
+
+
+
+
         Console.WriteLine("-----------------------------------------------------------------")
         Console.WriteLine(">>> Finished Successfully at " & DateTime.Now.ToString("HH:mm:ss"))
+
+
+
 
 
     End Sub
