@@ -5,12 +5,12 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{80DFA99B-5621-461E-B63C-EC2AE00AE755}</ProjectGuid>
-    <OutputType>Exe</OutputType>
-    <StartupObject>GenerativeListView3.Program</StartupObject>
+    <OutputType>WinExe</OutputType>
+    <StartupObject>GenerativeListView3.My.MyApplication</StartupObject>
     <RootNamespace>GenerativeListView3</RootNamespace>
     <AssemblyName>GenerativeListView3</AssemblyName>
     <FileAlignment>512</FileAlignment>
-    <MyType>Console</MyType>
+    <MyType>WindowsForms</MyType>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
@@ -79,6 +79,7 @@
     <Compile Include="ApplicationEvents.vb" />
     <Compile Include="CatiaDataExtractor.vb" />
     <Compile Include="CatiaSession.vb" />
+    <Compile Include="ComCleaner.vb" />
     <Compile Include="ExcelDataInjector.vb" />
     <Compile Include="ExcelFormatter.vb" />
     <Compile Include="Form1.vb">
