@@ -50,10 +50,11 @@ Module Program
 
 
 
-        ' --- 3. GESTIÓN DE DIRECTORIOS ---
+        ' --- 3. GESTIÓN DE DIRECTORIOS y nombre del nuevo archivo .xlsx ---
         Dim baseDir As String = "C:\Temp"
         Dim timestamp As String = DateTime.Now.ToString("yyyyMMdd_HHmmss")
         Dim folderPath As String = IO.Path.Combine(baseDir, "Export_" & timestamp)
+        Dim excelFileName As String = IO.Path.Combine(folderPath, "Reporte_" & timestamp & ".xlsx")
         If Not IO.Directory.Exists(folderPath) Then
             IO.Directory.CreateDirectory(folderPath)
         End If
@@ -63,23 +64,30 @@ Module Program
 
 
 
+
         '**************************************************************************************
         ' Funcionalidades principales: EXTRACCIÓN, ESCRITURA Y FORMATEO
         '**************************************************************************************
-        Dim oCatiaDataextractor As New CatiaDataExtractor
-        Dim oExcelWriter As New ExcelDataWriter
-        Dim oExcelFormater As New ExcelFormatter
-        Dim oCatiaData As Dictionary(Of String, PwrProduct)
-        Dim excelFileName As String = IO.Path.Combine(folderPath, "Reporte_" & timestamp & ".xlsx")
 
-        ' Paso 1: Extraer datos
+        Dim oCatiaDataextractor As New CatiaDataExtractor
+
+        Dim oExcelDataInjector As New ExcelDataInjector
+
+        Dim oExcelFormater As New ExcelFormatter
+
+        Dim oCatiaData As Dictionary(Of String, PwrProduct)
+
+
+        ' Extraer datos
         oCatiaData = oCatiaDataextractor.ExtractData(oProduct, folderPath, True)
 
-        ' Paso 2: Escribir en Excel (Usamos el nuevo objeto oExcelWriter)
-        oExcelWriter.CompletaListView2(oProduct, oWorkSheet, folderPath, oCatiaData)
+        ' Escribir en Excel
+        oExcelDataInjector.InjectData(oWorkSheet, oCatiaData)
 
-        ' Paso 3: Formatear y Guardar
-        oExcelFormater.FormatoListView2(oWorkSheet, oCatiaData.Count)
+        ' Formatear 
+        oExcelFormater.FormatoListView2(oWorkSheet)
+
+        ' Guardar
         oWorkbook.SaveAs(excelFileName)
 
 
@@ -124,8 +132,6 @@ Module Program
         GC.WaitForPendingFinalizers()
         GC.Collect()
         GC.WaitForPendingFinalizers()
-
-
 
 
 

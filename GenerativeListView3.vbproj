@@ -79,7 +79,7 @@
     <Compile Include="ApplicationEvents.vb" />
     <Compile Include="CatiaDataExtractor.vb" />
     <Compile Include="CatiaSession.vb" />
-    <Compile Include="ExcelDataWriter.vb" />
+    <Compile Include="ExcelDataInjector.vb" />
     <Compile Include="ExcelFormatter.vb" />
     <Compile Include="Form1.vb">
       <SubType>Form</SubType>
@@ -106,7 +106,6 @@
     </Compile>
     <Compile Include="PwrProduct.vb" />
     <Compile Include="Program.vb" />
-    <Compile Include="To_Excel.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Form1.resx">

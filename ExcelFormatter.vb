@@ -3,27 +3,26 @@ Option Strict On
 
 Public Class ExcelFormatter
 
-    Sub FormatoListView2(oWorkSheetListView As Microsoft.Office.Interop.Excel.Worksheet, rows As Integer)
+    Sub FormatoListView2(oWorkSheetListView As Microsoft.Office.Interop.Excel.Worksheet)
 
         Console.WriteLine("[" & DateTime.Now.ToString("HH:mm:ss") & "] Step 3/3: Formatting Excel...")
 
-        oWorkSheetListView.Activate() : oWorkSheetListView.Name = "ListView"
+        ' --- 1. DETECCIÓN AUTOMÁTICA DE FILAS ---
+        ' Buscamos la última fila con datos en la columna A
+        Dim lastRow As Integer = CType(oWorkSheetListView.Cells(oWorkSheetListView.Rows.Count, 1), Microsoft.Office.Interop.Excel.Range).End(Microsoft.Office.Interop.Excel.XlDirection.xlUp).Row
+        If lastRow < 3 Then lastRow = 3 ' Mínimo hasta la fila 3 para no romper el formato
+
+        oWorkSheetListView.Activate()
+        oWorkSheetListView.Name = "ListView"
 
         Dim oWorkBook As Microsoft.Office.Interop.Excel.Workbook = CType(oWorkSheetListView.Parent, Microsoft.Office.Interop.Excel.Workbook)
-
-        'Está asignando el item 1 del total de todas las ventanas.
         Dim viewListView As Microsoft.Office.Interop.Excel.WorksheetView = CType(oWorkBook.Windows.Item(1).SheetViews.Item(1), Microsoft.Office.Interop.Excel.WorksheetView)
         viewListView.DisplayGridlines = False
+
         Dim oRangoEncabezado As Microsoft.Office.Interop.Excel.Range = oWorkSheetListView.Range("A1", "L2")
-        Dim oRangoCuerpo As Microsoft.Office.Interop.Excel.Range = oWorkSheetListView.Range("A3", "L3")
-        Dim strColumnLetter As String
-        Dim oCurrentRange As Microsoft.Office.Interop.Excel.Range
-        Dim a As String
-        Dim b As String
+        Dim oRangoCuerpoEncabezado As Microsoft.Office.Interop.Excel.Range = oWorkSheetListView.Range("A3", "L3")
 
-
-        ' // Arma el diccionario con los textos del encabezado. Si a futuro se requieren otras columnas
-        ' // hay que modificar esto. Se pueden armar diccionarios o listas aparte y luego pasarlas como argumentos
+        ' --- 2. DICCIONARIO DE ENCABEZADOS (Tu lógica original) ---
         Dim oDicListViewColumnText As New Dictionary(Of String, String) From {
             {"A1", "#"},
             {"B1", "CurrentDirectory"},
@@ -42,16 +41,15 @@ Public Class ExcelFormatter
             oWorkSheetListView.Range(kvp.Key).Value = kvp.Value
         Next
 
-        ' Bordes del encabezado
+        ' --- 3. BORDES Y ESTILOS (Tu lógica original) ---
         For Each c As Microsoft.Office.Interop.Excel.Range In oRangoEncabezado.Cells
-            With c
-                .Borders().Item(Microsoft.Office.Interop.Excel.XlBordersIndex.xlEdgeRight).LineStyle = 1
-                .Borders().Item(Microsoft.Office.Interop.Excel.XlBordersIndex.xlEdgeLeft).LineStyle = 1
-                .Borders().Item(Microsoft.Office.Interop.Excel.XlBordersIndex.xlEdgeBottom).LineStyle = -4119
+            With c.Borders
+                .Item(Microsoft.Office.Interop.Excel.XlBordersIndex.xlEdgeRight).LineStyle = 1
+                .Item(Microsoft.Office.Interop.Excel.XlBordersIndex.xlEdgeLeft).LineStyle = 1
+                .Item(Microsoft.Office.Interop.Excel.XlBordersIndex.xlEdgeBottom).LineStyle = -4119
             End With
         Next
 
-        ' Fuente, tamaño y alineado de todo el documento
         With oWorkSheetListView.Cells
             .Font.Name = "Tahoma"
             .Font.Size = 8
@@ -59,7 +57,6 @@ Public Class ExcelFormatter
             .VerticalAlignment = -4107
         End With
 
-        ' Fuente, tamaño y alineado del encabezado
         With oWorkSheetListView
             .Range("A1", "D1").Interior.ColorIndex = 15
             .Range("E1", "K1").Interior.Color = RGB(204, 255, 255)
@@ -68,35 +65,35 @@ Public Class ExcelFormatter
             .Range("A1", "L1").Font.Bold = True
         End With
 
-
-        ' Hace AutoFit pero a la columna de imagenes no.
-        ' Aca hay que incluir la opcion de que si la planilla va a tener imagenes entonces que no haga AutoFit,
-        ' pero si son incluidas las imagenes, no debería hacer autofit.
-        For Each C As Microsoft.Office.Interop.Excel.Range In oRangoEncabezado
-            C.EntireColumn.AutoFit()
+        ' --- 4. AUTOFIT SELECTIVO ---
+        ' Hacemos AutoFit de A hasta K (columna 11). La L (12) la dejamos fija para la imagen.
+        For i As Integer = 1 To 11
+            CType(oWorkSheetListView.Columns(i), Microsoft.Office.Interop.Excel.Range).EntireColumn.AutoFit()
         Next
 
-
-        ' Formato aplicado a todo el cuerpo
+        ' --- 5. FORMATO DEL CUERPO (Usando lastRow) ---
         With oWorkSheetListView
-            .Range("A3", "L" & rows + 2).VerticalAlignment = Microsoft.Office.Interop.Excel.XlVAlign.xlVAlignCenter
-            .Range("A3", "L" & rows + 2).HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignCenter
-            .Range("L3", "L" & rows + 2).RowHeight = 100
-            .Range("L3", "L" & rows + 2).ColumnWidth = 18
-            .Range("E3", "E" & rows + 2).ColumnWidth = 18
+            Dim rangeCuerpoCompleto As String = "A3:L" & lastRow
+            .Range(rangeCuerpoCompleto).VerticalAlignment = Microsoft.Office.Interop.Excel.XlVAlign.xlVAlignCenter
+            .Range(rangeCuerpoCompleto).HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignCenter
+
+            ' Altura y anchos específicos
+            .Range("L3:L" & lastRow).RowHeight = 100
+            .Range("L3:L" & lastRow).ColumnWidth = 18
+            .Range("E3:E" & lastRow).ColumnWidth = 18
         End With
 
+        ' --- 6. BORDES DE COLUMNAS (Lógica corregida para evitar el error de letra) ---
+        For Each c As Microsoft.Office.Interop.Excel.Range In oRangoCuerpoEncabezado.Cells
+            ' Obtenemos la letra de la columna de forma segura
+            Dim colLetter As String = Split(c.Address(True, False), "$")(0)
 
-        ' Para aplicar los bordes a cada columna hasta la última fila de datos,
-        ' hay que hacer estos pasos para armar el rango
-        For Each c As Microsoft.Office.Interop.Excel.Range In oRangoCuerpo
-            strColumnLetter = Left(c.Address(False, False, ReferenceStyle:=Microsoft.Office.Interop.Excel.XlReferenceStyle.xlA1), 1)
-            a = c.Address(False, False, ReferenceStyle:=Microsoft.Office.Interop.Excel.XlReferenceStyle.xlA1)
-            b = strColumnLetter & rows + 2
-            oCurrentRange = oWorkSheetListView.Range(a, b)
-            With oCurrentRange
-                .Borders().Item(Microsoft.Office.Interop.Excel.XlBordersIndex.xlEdgeRight).LineStyle = 1
-                .Borders().Item(Microsoft.Office.Interop.Excel.XlBordersIndex.xlEdgeLeft).LineStyle = 1
+            ' Creamos el rango desde la fila 3 hasta la última fila detectada
+            Dim oCurrentRange As Microsoft.Office.Interop.Excel.Range = oWorkSheetListView.Range(colLetter & "3", colLetter & lastRow)
+
+            With oCurrentRange.Borders
+                .Item(Microsoft.Office.Interop.Excel.XlBordersIndex.xlEdgeRight).LineStyle = 1
+                .Item(Microsoft.Office.Interop.Excel.XlBordersIndex.xlEdgeLeft).LineStyle = 1
             End With
         Next
 

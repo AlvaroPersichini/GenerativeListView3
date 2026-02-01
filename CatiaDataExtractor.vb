@@ -94,8 +94,10 @@ Public Class CatiaDataExtractor
     End Sub
 
     Private Function TakeSnapshot(oProd As ProductStructureTypeLib.Product, folder As String, isRoot As Boolean) As String
+
         ' Limpiar el nombre para evitar errores con caracteres como / o *
         Dim safePartNumber As String = CleanFileName(oProd.PartNumber)
+
         Dim finalFileName As String = IO.Path.Combine(folder, safePartNumber & ".jpg")
 
         Dim oApp As INFITF.Application = oProd.Application

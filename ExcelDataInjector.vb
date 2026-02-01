@@ -1,15 +1,12 @@
 ﻿Option Explicit On
 Option Strict On
 
-Public Class ExcelDataWriter
+Public Class ExcelDataInjector
 
     ''' <summary>
     ''' Vuelca la información del diccionario en la hoja de Excel seleccionada.
     ''' </summary>
-    Sub CompletaListView2(oProduct As ProductStructureTypeLib.Product,
-                          oSheetListView As Microsoft.Office.Interop.Excel.Worksheet,
-                          strDir As String,
-                          oDiccType3 As Dictionary(Of String, PwrProduct))
+    Sub InjectData(oSheetListView As Microsoft.Office.Interop.Excel.Worksheet, oDiccType3 As Dictionary(Of String, PwrProduct))
 
         Console.WriteLine("[" & DateTime.Now.ToString("HH:mm:ss") & "] Step 2/3: Filling Excel with extracted data...")
 
