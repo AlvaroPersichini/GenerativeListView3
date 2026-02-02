@@ -48,21 +48,28 @@ Public Class CatiaDataExtractor
     End Function
 
     Private Sub ProcesarHijosRecursivo(oParent As ProductStructureTypeLib.Product,
-                                      ByRef oDictionary As Dictionary(Of String, PwrProduct),
-                                      ByVal currentLevel As Integer,
-                                      folderPath As String,
-                                      takeSnaps As Boolean,
-                                      oParentDoc As INFITF.Document) ' <-- Recibe el Doc del Padre
+                                  ByRef oDictionary As Dictionary(Of String, PwrProduct),
+                                  ByVal currentLevel As Integer,
+                                  folderPath As String,
+                                  takeSnaps As Boolean,
+                                  oParentDoc As INFITF.Document)
 
         For Each oChild As ProductStructureTypeLib.Product In oParent.Products
-            ' Obtenemos el documento al que pertenece la referencia del hijo
-            Dim oChildDoc As INFITF.Document = CType(oChild.ReferenceProduct.Parent, INFITF.Document)
+            Dim oChildDoc As INFITF.Document = Nothing
 
-            ' COMPARACIÓN DINÁMICA: Si el hijo vive en el mismo archivo que el padre
+            Try
+                ' Intento obtener el documento de la referencia
+                ' Si el link está roto, esta línea disparará el E_FAIL
+                oChildDoc = CType(oChild.ReferenceProduct.Parent, INFITF.Document)
+            Catch ex As Exception
+                ' CASO: LINK ROTO
+                Console.WriteLine(" ALERTA: Link roto detectado en '" & oChild.Name & "'. Se omitirá este elemento.")
+                Continue For ' Salta al siguiente hijo del bucle
+            End Try
+
+            ' Si llegamos aquí, el documento existe y es accesible
             If oChildDoc.FullName = oParentDoc.FullName Then
-
-                ' ES UN COMPONENT: Atravesamos sin registrar y mantenemos el nivel
-                ' Pasamos el mismo oParentDoc porque el componente no genera un archivo nuevo
+                ' ES UN COMPONENT (Internal)
                 ProcesarHijosRecursivo(oChild, oDictionary, currentLevel, folderPath, takeSnaps, oParentDoc)
             Else
                 ' ES UN ARCHIVO REAL (Part o Product)
@@ -80,12 +87,13 @@ Public Class CatiaDataExtractor
                         .Level = currentLevel
                         .FileName = oChildDoc.Name
                         .FullPath = GetJustDirectory(oChildDoc.FullName)
+                        ' Solo tomamos snapshot si el link no está roto (ya validado arriba)
                         .ImageFilePath = If(takeSnaps, TakeSnapshot(oChild, folderPath, False), "")
                     End With
                     oDictionary.Add(pNumber, PP)
                 End If
 
-                ' Si es un ensamble real, profundizamos pasando el documento del HIJO como nuevo padre
+                ' Si es un ensamble real y no está roto, profundizamos
                 If TypeOf oChildDoc Is ProductStructureTypeLib.ProductDocument Then
                     ProcesarHijosRecursivo(oChild, oDictionary, currentLevel + 1, folderPath, takeSnaps, oChildDoc)
                 End If

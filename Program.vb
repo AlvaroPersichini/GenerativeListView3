@@ -80,7 +80,7 @@ Module Program
 
         ' Limpieza
         Dim oCleaner As New ComCleaner()
-        oCleaner.CleanExcel(myExcel, oWorkbook, oWorkSheets, oWorkSheet)
+        oCleaner.CleanExcel(myExcel, oWorkbooks, oWorkbook, oWorkSheets, oWorkSheet)
         oCleaner.CleanCatia(session.Application, CType(oProduct.ReferenceProduct.Parent, INFITF.Document), oProduct, oCatiaData)
 
 
