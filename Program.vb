@@ -5,23 +5,8 @@ Module Program
 
     Sub Main()
 
-
         Console.WriteLine(">>> Starting Export Process...")
         Console.WriteLine("------------------------------------------------")
-
-
-
-        ' --- 1. CONEXIÓN Y VALIDACIÓN CON CATIA ---
-        'Dim session As New CatiaSession()
-        'If session.Status <> CatiaSession.CatiaSessionStatus.ProductDocument Then
-        '    MsgBox(session.Description, MsgBoxStyle.Critical)
-        '    Exit Sub
-        'End If
-        'Dim oAppCatia As INFITF.Application = session.Application : oAppCatia.DisplayFileAlerts = False
-        ''  Dim oProductDocument As ProductStructureTypeLib.ProductDocument = CType(oAppCatia.ActiveDocument, ProductStructureTypeLib.ProductDocument)
-        'Dim oProduct As ProductStructureTypeLib.Product = oProductDocument.Product
-
-
 
 
         ' --- 1. CONEXIÓN Y VALIDACIÓN CON CATIA ---

@@ -3,9 +3,6 @@ Option Strict On
 
 Public Class ExcelDataInjector
 
-    ''' <summary>
-    ''' Vuelca la información del diccionario en la hoja de Excel seleccionada.
-    ''' </summary>
     Sub InjectData(oSheetListView As Microsoft.Office.Interop.Excel.Worksheet, oDiccType3 As Dictionary(Of String, PwrProduct))
 
         Console.WriteLine("[" & DateTime.Now.ToString("HH:mm:ss") & "] Step 2/3: Filling Excel with extracted data...")

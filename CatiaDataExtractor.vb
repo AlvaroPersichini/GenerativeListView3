@@ -1,17 +1,16 @@
 ﻿Option Explicit On
 Option Strict On
 
-'El manejo de los "Components" 
-'Los detecta y los salta: Si encuentra un "Component"
-'(no tienen un archivo propio y solo sirven para organizar),
-'el programa se da cuenta y no los pone en la lista.
-'Aunque salte el Component, entra a mirar qué tiene dentro. Si adentro hay piezas reales, las trata normalmente.
+' El manejo de los "Components" 
+' Los detecta y los salta: Si encuentra un "Component"
+' (no tienen un archivo propio y solo sirven para organizar),
+' el programa se da cuenta y no los pone en la lista.
+' Aunque salte el Component, entra a mirar qué tiene dentro. Si adentro hay piezas reales, las trata normalmente.
+
+' Tiene un bloque try-catch para detectar si el link está roto. Si lo está, avisa por consola y omite ese elemento.
 
 Public Class CatiaDataExtractor
 
-    ''' <summary>
-    ''' Extrae los datos de la estructura de CATIA y genera capturas de pantalla.
-    ''' </summary>
     Public Function ExtractData(oRootProduct As ProductStructureTypeLib.Product,
                                 folderPath As String,
                                 takeSnaps As Boolean) As Dictionary(Of String, PwrProduct)
@@ -55,8 +54,10 @@ Public Class CatiaDataExtractor
                                   oParentDoc As INFITF.Document)
 
         For Each oChild As ProductStructureTypeLib.Product In oParent.Products
+
             Dim oChildDoc As INFITF.Document = Nothing
 
+            'este Try bloque es el que detecta si el link está roto
             Try
                 ' Intento obtener el documento de la referencia
                 ' Si el link está roto, esta línea disparará el E_FAIL
@@ -168,9 +169,6 @@ Public Class CatiaDataExtractor
     End Function
 
 
-    ''' <summary>
-    ''' Reemplaza caracteres inválidos del PartNumber para poder guardar el archivo en Windows.
-    ''' </summary>
     Private Function CleanFileName(name As String) As String
         Dim invalidChars As New String(IO.Path.GetInvalidFileNameChars())
         Dim cleaned As String = name
@@ -181,9 +179,6 @@ Public Class CatiaDataExtractor
     End Function
 
 
-    ''' <summary>
-    ''' Extrae el directorio de una ruta FullName de CATIA (Soporta Windows y DLNames).
-    ''' </summary>
     Private Function GetJustDirectory(fullPath As String) As String
         If String.IsNullOrEmpty(fullPath) Then Return ""
         ' Buscamos el último separador de Windows (\) o de DLName (/)
@@ -193,5 +188,6 @@ Public Class CatiaDataExtractor
         End If
         Return fullPath
     End Function
+
 
 End Class
