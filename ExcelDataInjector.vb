@@ -12,7 +12,15 @@ Public Class ExcelDataInjector
 
         ' Formateo masivo de celdas como texto antes de empezar
         Dim ultimoFila As Integer = oDiccType3.Count + 2
-        oSheetListView.Range("A3:L" & ultimoFila).NumberFormat = "@"
+        Dim rngCuerpo As Microsoft.Office.Interop.Excel.Range = Nothing
+        Try
+            rngCuerpo = oSheetListView.Range("A3:L" & ultimoFila)
+            rngCuerpo.NumberFormat = "@"
+        Catch ex As Exception
+            Throw New Exception("Error al acceder al rango de Excel. ¿Excel sigue abierto?", ex)
+        Finally
+            If rngCuerpo IsNot Nothing Then System.Runtime.InteropServices.Marshal.ReleaseComObject(rngCuerpo)
+        End Try
 
 
         For Each kvp As KeyValuePair(Of String, PwrProduct) In oDiccType3
@@ -21,7 +29,8 @@ Public Class ExcelDataInjector
             Dim oDoc As INFITF.Document = CType(kvp.Value.Product.ReferenceProduct.Parent, INFITF.Document) ' Para el nombre del archivo (Parent es un Document)
 
             With oSheetListView
-                ' Asignación de valores con CType para cumplir con Option Strict On
+
+                ' Valores
                 CType(.Cells(i, "A"), Microsoft.Office.Interop.Excel.Range).Value2 = i - 2
                 CType(.Cells(i, "B"), Microsoft.Office.Interop.Excel.Range).Value2 = kvp.Value.FullPath
                 CType(.Cells(i, "C"), Microsoft.Office.Interop.Excel.Range).Value2 = kvp.Value.FileName
@@ -34,7 +43,7 @@ Public Class ExcelDataInjector
                 CType(.Cells(i, "J"), Microsoft.Office.Interop.Excel.Range).Value2 = kvp.Value.Product.Nomenclature
                 CType(.Cells(i, "K"), Microsoft.Office.Interop.Excel.Range).Value2 = kvp.Value.Product.Definition
 
-                ' Inserción de imagen con coordenadas Single (CSng)
+                ' Imagen
                 If IO.File.Exists(sImgPath) Then
                     Dim cl As Microsoft.Office.Interop.Excel.Range = CType(.Cells(i, "L"), Microsoft.Office.Interop.Excel.Range)
                     oShape = .Shapes.AddPicture(sImgPath,
