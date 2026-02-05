@@ -6,7 +6,6 @@ Option Strict On
 ' (no tienen un archivo propio y solo sirven para organizar),
 ' el programa se da cuenta y no los pone en la lista.
 ' Aunque salte el Component, entra a mirar qué tiene dentro. Si adentro hay piezas reales, las trata normalmente.
-
 ' Tiene un bloque try-catch para detectar si el link está roto. Si lo está, avisa por consola y omite ese elemento.
 
 Public Class CatiaDataExtractor
@@ -181,7 +180,6 @@ Public Class CatiaDataExtractor
 
     Private Function GetJustDirectory(fullPath As String) As String
         If String.IsNullOrEmpty(fullPath) Then Return ""
-        ' Buscamos el último separador de Windows (\) o de DLName (/)
         Dim lastSlash As Integer = Math.Max(fullPath.LastIndexOf("\"), fullPath.LastIndexOf("/"))
         If lastSlash > 0 Then
             Return fullPath.Substring(0, lastSlash)

@@ -30,7 +30,7 @@ Module Program
 
 
 
-        ' --- 3. GESTIÓN DE DIRECTORIOS ---
+        ' Directorios y nombres
         Dim baseDir As String = "C:\Temp"
         Dim timestamp As String = DateTime.Now.ToString("yyyyMMdd_HHmmss")
         Dim folderPath As String = IO.Path.Combine(baseDir, "Export_" & timestamp)
@@ -45,7 +45,8 @@ Module Program
         ' Extraer
         Dim oCatiaData As Dictionary(Of String, PwrProduct)
         Dim oCatiaDataextractor As New CatiaDataExtractor
-        oCatiaData = oCatiaDataextractor.ExtractData(oProduct, folderPath, True)
+        Dim addImages As Boolean = True
+        oCatiaData = oCatiaDataextractor.ExtractData(oProduct, folderPath, addImages)
 
 
 
