@@ -21,12 +21,13 @@ Module Program
 
 
         ' Excel
-        Dim xlSession As New ExcelSession()
-        xlSession.CreateNewWorkbook()
-        If Not xlSession.IsReady Then
-            Console.WriteLine(xlSession.ErrorMessage)
+        Dim oExcelSession As New ExcelSession()
+        oExcelSession.CreateNewWorkbook()
+        If Not oExcelSession.IsReady Then
+            Console.WriteLine(oExcelSession.ErrorMessage)
             Return
         End If
+
 
 
 
@@ -52,24 +53,24 @@ Module Program
 
         ' Inyectar
         Dim oExcelDataInjector As New ExcelDataInjector
-        oExcelDataInjector.InjectData(xlSession.Worksheet, oCatiaData)
+        oExcelDataInjector.InjectData(oExcelSession.Worksheet, oCatiaData)
 
 
 
         ' Formatear 
         Dim oExcelFormater As New ExcelFormatter
-        oExcelFormater.FormatoListView2(xlSession.Worksheet)
+        oExcelFormater.FormatoListView2(oExcelSession.Worksheet)
 
 
 
         ' Guardar
-        xlSession.Workbook.SaveAs(excelFileName)
+        oExcelSession.Workbook.SaveAs(excelFileName)
 
 
 
         ' Limpieza
         Dim oCleaner As New ComCleaner()
-        oCleaner.CleanExcel(xlSession.Application, xlSession.Workbooks, xlSession.Workbook, xlSession.Worksheets, xlSession.ActiveSheet)
+        oCleaner.CleanExcel(oExcelSession.Application, oExcelSession.Workbooks, oExcelSession.Workbook, oExcelSession.Worksheets, oExcelSession.ActiveSheet)
         oCleaner.CleanCatia(CATIAsession.Application, CType(oProduct.ReferenceProduct.Parent, INFITF.Document), oProduct, oCatiaData)
 
 

@@ -1,4 +1,4 @@
-﻿
+﻿Option Explicit On
 
 Public Class ExcelSession
     ' Declaración de la API de Windows para obtener el PID
@@ -16,20 +16,29 @@ Public Class ExcelSession
 
     Public Sub New()
 
+        Me.Application = New Microsoft.Office.Interop.Excel.Application
+        If Me.Application Is Nothing Then Throw New Exception("No se pudo iniciar Excel.")
+
+        Me.Application.Visible = False
+        Me.Application.ScreenUpdating = False
+        Me.Application.DisplayAlerts = False
+
     End Sub
 
 
 
     Sub CreateNewWorkbook()
+
         Try
             ' 1. Inicializar la aplicación
-            '    Me.Application = New Microsoft.Office.Interop.Excel.Application With {
-            '    .Visible = False,
-            '    .ScreenUpdating = False,
-            '    .DisplayAlerts = False
-            '}
 
             Me.Application = New Microsoft.Office.Interop.Excel.Application
+            If Me.Application Is Nothing Then Throw New Exception("No se pudo iniciar Excel.")
+
+            Me.Application.Visible = False
+            Me.Application.ScreenUpdating = False
+            Me.Application.DisplayAlerts = False
+
 
             ' 2. Obtener la colección de libros y AGREGAR uno nuevo
             Me.Workbooks = Me.Application.Workbooks
@@ -42,21 +51,25 @@ Public Class ExcelSession
 
             Me.IsReady = True
 
+
         Catch ex As System.Runtime.InteropServices.COMException
             Me.ErrorMessage = ">>> No se pudo crear nuevo archivo Excel. Error COM: " & ex.Message
         Catch ex As Exception
             Me.ErrorMessage = ">>> [ERROR] " & ex.Message
         End Try
+
     End Sub
 
 
     Sub GetActiveWorkbook()
+
         Try
 
-            ' 1. Conexión con instancia de Excel existente
+            ' Excel existente
             Me.Application = CType(System.Runtime.InteropServices.Marshal.GetActiveObject("Excel.Application"), Microsoft.Office.Interop.Excel.Application)
 
-            ' Para enviar keystroke ESC y cerrar posibles celda en edición
+
+            ' Keystroke ESC y cerrar posibles celda en edición
             Dim excelHwnd As New IntPtr(Me.Application.Hwnd)
             Dim excelPid As Integer
             GetWindowThreadProcessId(excelHwnd, excelPid)
