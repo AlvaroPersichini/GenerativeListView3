@@ -1,4 +1,5 @@
 ﻿Option Explicit On
+Option Strict On
 
 Public Class ExcelSession
     ' Declaración de la API de Windows para obtener el PID
@@ -16,88 +17,62 @@ Public Class ExcelSession
 
     Public Sub New()
 
-        Me.Application = New Microsoft.Office.Interop.Excel.Application
-        If Me.Application Is Nothing Then Throw New Exception("No se pudo iniciar Excel.")
-
-        Me.Application.Visible = False
-        Me.Application.ScreenUpdating = False
-        Me.Application.DisplayAlerts = False
-
     End Sub
 
 
 
     Sub CreateNewWorkbook()
-
         Try
-            ' 1. Inicializar la aplicación
-
             Me.Application = New Microsoft.Office.Interop.Excel.Application
-            If Me.Application Is Nothing Then Throw New Exception("No se pudo iniciar Excel.")
-
-            Me.Application.Visible = False
-            Me.Application.ScreenUpdating = False
-            Me.Application.DisplayAlerts = False
-
-
-            ' 2. Obtener la colección de libros y AGREGAR uno nuevo
-            Me.Workbooks = Me.Application.Workbooks
-            Me.Workbook = Me.Workbooks.Add() ' <-- Crucial: Crea el archivo
-
-            ' 3. Asignar la hoja activa o la primera hoja del libro creado
-            ' Es más seguro referenciarla desde el objeto Workbook recién creado
-            Me.Worksheet = CType(Me.Workbook.Sheets(1), Microsoft.Office.Interop.Excel.Worksheet)
-            Me.ActiveSheet = Me.Worksheet
-
-            Me.IsReady = True
-
-
-        Catch ex As System.Runtime.InteropServices.COMException
-            Me.ErrorMessage = ">>> No se pudo crear nuevo archivo Excel. Error COM: " & ex.Message
+            With Me
+                .Application.Visible = False
+                .Application.ScreenUpdating = False
+                .Application.DisplayAlerts = False
+                .Workbooks = Me.Application.Workbooks
+                .Workbook = Me.Workbooks.Add()
+                .Worksheets = Me.Worksheets
+                .Worksheet = CType(Me.Worksheets(1), Microsoft.Office.Interop.Excel.Worksheet)
+                .ActiveSheet = Me.Worksheet
+                .IsReady = True
+            End With
         Catch ex As Exception
-            Me.ErrorMessage = ">>> [ERROR] " & ex.Message
+            MsgBox("Error al iniciar Excel: " & ex.Message, MsgBoxStyle.Critical)
+            Me.IsReady = False
         End Try
-
     End Sub
+
 
 
     Sub GetActiveWorkbook()
 
+        ' Excel existente
         Try
-
-            ' Excel existente
-            Me.Application = CType(System.Runtime.InteropServices.Marshal.GetActiveObject("Excel.Application"), Microsoft.Office.Interop.Excel.Application)
-
-
-            ' Keystroke ESC y cerrar posibles celda en edición
-            Dim excelHwnd As New IntPtr(Me.Application.Hwnd)
-            Dim excelPid As Integer
-            GetWindowThreadProcessId(excelHwnd, excelPid)
-            AppActivate(excelPid)
-            SendKeys.SendWait("{ESC}")
-
-
-
-            If Me.Application.ActiveWorkbook Is Nothing Then
-                Me.ErrorMessage = ">>> [ERROR] Excel abierto pero sin libros activos."
-                Return
-            End If
-
-
-            Me.Workbooks = Me.Application.Workbooks
-            Me.Workbook = Me.Application.ActiveWorkbook
-            Me.ActiveSheet = CType(Me.Workbook.ActiveSheet, Microsoft.Office.Interop.Excel.Worksheet)
-            Me.IsReady = True
-
-
+            Me.Application = CType(Runtime.InteropServices.Marshal.GetActiveObject("Excel.Application"), Microsoft.Office.Interop.Excel.Application)
         Catch ex As System.Runtime.InteropServices.COMException
-            Me.ErrorMessage = ">>> [ERROR] No se detectó ninguna instancia de Excel abierta."
-        Catch ex As System.Exception
-            Me.ErrorMessage = ">>> [ERROR] " & ex.Message
+            Me.ErrorMessage = ">>> [ERROR] GetActiveObject(Excel.Application)"
+            Exit Sub
         End Try
+        If Me.Application.ActiveWorkbook Is Nothing Then
+            Me.ErrorMessage = ">>> [ERROR] Excel abierto pero sin libros activos."
+            Return
+        End If
+
+        ' Keystroke ESC y cerrar posibles celda en edición
+        Dim excelHwnd As New IntPtr(Me.Application.Hwnd)
+        Dim excelPid As Integer
+        GetWindowThreadProcessId(excelHwnd, excelPid)
+        AppActivate(excelPid)
+        SendKeys.SendWait("{ESC}")
+
+
+
+        Me.Workbooks = Me.Application.Workbooks
+        Me.Workbook = Me.Application.ActiveWorkbook
+        Me.ActiveSheet = CType(Me.Workbook.ActiveSheet, Microsoft.Office.Interop.Excel.Worksheet)
+
+        ' bandera
+        Me.IsReady = True
 
     End Sub
-
-
 
 End Class
