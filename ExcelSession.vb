@@ -70,11 +70,13 @@ Public Class ExcelSession
 
 
     Function GetNCUSheet(ByVal ncuPath As String) As Microsoft.Office.Interop.Excel.Worksheet
+        Dim sheets As Microsoft.Office.Interop.Excel.Sheets = Me.NCUWorkbook.Worksheets
         Try
             With Me
                 .Application = CType(Runtime.InteropServices.Marshal.GetActiveObject("Excel.Application"), Microsoft.Office.Interop.Excel.Application)
                 .Application.ScreenUpdating = False
                 .Application.DisplayAlerts = False
+
                 .NCUWorkbook = .Application.Workbooks.Open(ncuPath, ReadOnly:=True)
                 .NCUWorkbook.Windows(1).Visible = False
                 NCUSheet = CType(.NCUWorkbook.Worksheets(1), Microsoft.Office.Interop.Excel.Worksheet)
