@@ -20,13 +20,15 @@ Module Program
         CATIAsession.Application.DisplayFileAlerts = False
 
 
+
+
         ' Excel
         Dim oExcelSession As New ExcelSession()
-        oExcelSession.CreateNewWorkbook()
-        If Not oExcelSession.IsReady Then
-            Console.WriteLine(oExcelSession.ErrorMessage)
-            Return
-        End If
+        Dim oWorkbook As Microsoft.Office.Interop.Excel.Workbook = oExcelSession.CreateNewWorkbook()
+        Dim oSheets As Microsoft.Office.Interop.Excel.Sheets = oWorkbook.Sheets
+        Dim oSheet As Microsoft.Office.Interop.Excel.Worksheet = CType(oSheets.Item(1), Microsoft.Office.Interop.Excel.Worksheet)
+
+
 
 
         ' Directorios y nombres
@@ -48,12 +50,12 @@ Module Program
 
         ' Inyectar a EXCEL
         Dim oExcelDataInjector As New ExcelDataInjector
-        oExcelDataInjector.InjectData(oExcelSession.Worksheet, oCatiaData)
+        oExcelDataInjector.InjectData(oSheet, oCatiaData)
 
 
         ' Formatear EXCEL
         Dim oExcelFormater As New ExcelFormatter
-        oExcelFormater.FormatoListView2(oExcelSession.Worksheet)
+        oExcelFormater.FormatoListView2(oSheet)
 
 
         ' Guardar EXCEL
@@ -62,7 +64,7 @@ Module Program
 
         ' Limpieza
         Dim oCleaner As New ComCleaner()
-        oCleaner.CleanExcel(oExcelSession.Application, oExcelSession.Workbooks, oExcelSession.Workbook, oExcelSession.Worksheets, oExcelSession.ActiveSheet)
+        oCleaner.CleanExcel(oExcelSession.Application, oExcelSession.Workbooks, oExcelSession.Workbook, oExcelSession.Sheets, oExcelSession.ActiveSheet)
         oCleaner.CleanCatia(CATIAsession.Application, CType(oProduct.ReferenceProduct.Parent, INFITF.Document), oProduct, oCatiaData)
 
 

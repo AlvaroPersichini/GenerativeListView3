@@ -1,6 +1,9 @@
 ﻿Option Explicit On
 Option Strict On
 
+
+
+
 ' El manejo de los "Components" 
 ' Los detecta y los salta: Si encuentra un "Component"
 ' (no tienen un archivo propio y solo sirven para organizar),
@@ -143,6 +146,11 @@ Public Class CatiaDataExtractor
 
         oCurrentWindow.Height = 300
         oCurrentWindow.Width = 300
+
+
+        ' 2. Cambiar el tipo de proyección a Paralela (Cylindric)
+        ' En la API de CATIA, Parallel se identifica como catProjectionCylindric
+        oViewer.Viewpoint3D.ProjectionMode = INFITF.CatProjectionMode.catProjectionCylindric
 
         ' Aplicar Vista Isométrica (Cámara 1)
         oViewer.Viewpoint3D = CType(oApp.ActiveDocument.Cameras.Item(1), INFITF.Camera3D).Viewpoint3D
