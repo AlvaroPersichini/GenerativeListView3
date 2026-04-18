@@ -1,5 +1,7 @@
-﻿Option Explicit On
+﻿
+Option Explicit On
 Option Strict On
+Imports CATIAClassLibrary
 
 Module Program
 
@@ -11,7 +13,7 @@ Module Program
 
 
         ' Catia
-        Dim CATIAsession As New CatiaSession()
+        Dim CATIAsession As New CatiaSession
         If Not CATIAsession.IsReady Then
             MsgBox(CATIAsession.Description)
             Exit Sub

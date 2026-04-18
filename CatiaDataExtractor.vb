@@ -2,8 +2,6 @@
 Option Strict On
 
 
-
-
 ' El manejo de los "Components" 
 ' Los detecta y los salta: Si encuentra un "Component"
 ' (no tienen un archivo propio y solo sirven para organizar),
