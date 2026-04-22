@@ -9,7 +9,7 @@ Module Program
 
         ' Inicio
         Console.WriteLine(">>> Starting Process...")
-        Console.WriteLine("------------------------------------------------")
+
 
 
         ' Catia
@@ -70,9 +70,9 @@ Module Program
         oCleaner.CleanCatia(CATIAsession.Application, CType(oProduct.ReferenceProduct.Parent, INFITF.Document), oProduct, oCatiaData)
 
 
-        Console.WriteLine("-----------------------------------------------------------------")
+
         Console.WriteLine(">>> Finished Successfully at " & DateTime.Now.ToString("HH:mm:ss"))
-        Console.WriteLine(">>> Cleanup Complete.")
+
 
 
     End Sub

@@ -2,12 +2,13 @@
 Option Strict On
 
 
-' El manejo de los "Components" 
-' Los detecta y los salta: Si encuentra un "Component"
-' (no tienen un archivo propio y solo sirven para organizar),
-' el programa se da cuenta y no los pone en la lista.
-' Aunque salte el Component, entra a mirar qué tiene dentro. Si adentro hay piezas reales, las trata normalmente.
+' El manejo de los "components": los detecta y los salta: si encuentra un "Component", no los pone en el oDictionary.
+' Aunque salte el Component, entra a mirar qué tiene dentro, si adentro hay piezas reales, las trata normalmente.
+
+' Links rotos: si el link de una pieza está roto, lo detecta porque al intentar acceder al documento de la referencia, lanza un error.
 ' Tiene un bloque try-catch para detectar si el link está roto. Si lo está, avisa por consola y omite ese elemento.
+
+
 
 Public Class CatiaDataExtractor
 
@@ -69,36 +70,39 @@ Public Class CatiaDataExtractor
             End Try
 
             ' Si llegamos aquí, el documento existe y es accesible
-            If oChildDoc.FullName = oParentDoc.FullName Then
-                ' ES UN COMPONENT (Internal)
+            If oChildDoc.FullName = oParentDoc.FullName Then  ' ES UN COMPONENT (Internal)
                 ProcesarHijosRecursivo(oChild, oDictionary, currentLevel, folderPath, takeSnaps, oParentDoc)
             Else
                 ' ES UN ARCHIVO REAL (Part o Product)
                 Dim pNumber As String = oChild.PartNumber
 
-                If oDictionary.ContainsKey(pNumber) Then
-                    oDictionary.Item(pNumber).Quantity += 1
-                Else
-                    Dim PP As New PwrProduct
-                    With PP
-                        .Product = oChild
-                        .Quantity = 1
-                        .ProductType = TypeName(oChildDoc)
-                        .Source = oChild.Source
-                        .Level = currentLevel
-                        .FileName = oChildDoc.Name
-                        .FullPath = GetJustDirectory(oChildDoc.FullName)
-                        ' Solo tomamos snapshot si el link no está roto (ya validado arriba)
-                        .ImageFilePath = If(takeSnaps, TakeSnapshot(oChild, folderPath, False), "")
-                    End With
-                    oDictionary.Add(pNumber, PP)
+                If Not pNumber.StartsWith("Aux", StringComparison.OrdinalIgnoreCase) Then
+
+                    If oDictionary.ContainsKey(pNumber) Then
+                        oDictionary.Item(pNumber).Quantity += 1
+                    Else
+                        Dim PP As New PwrProduct
+                        With PP
+                            .Product = oChild
+                            .Quantity = 1
+                            .ProductType = TypeName(oChildDoc)
+                            .Source = oChild.Source
+                            .Level = currentLevel
+                            .FileName = oChildDoc.Name
+                            .FullPath = GetJustDirectory(oChildDoc.FullName)
+                            ' Solo tomamos snapshot si el link no está roto (ya validado arriba)
+                            .ImageFilePath = If(takeSnaps, TakeSnapshot(oChild, folderPath, False), "")
+                        End With
+                        oDictionary.Add(pNumber, PP)
+                    End If
+
                 End If
 
                 ' Si es un ensamble real y no está roto, profundizamos
                 If TypeOf oChildDoc Is ProductStructureTypeLib.ProductDocument Then
-                    ProcesarHijosRecursivo(oChild, oDictionary, currentLevel + 1, folderPath, takeSnaps, oChildDoc)
+                        ProcesarHijosRecursivo(oChild, oDictionary, currentLevel + 1, folderPath, takeSnaps, oChildDoc)
+                    End If
                 End If
-            End If
         Next
     End Sub
 
