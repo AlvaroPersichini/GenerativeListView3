@@ -77,11 +77,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApplicationEvents.vb" />
-    <Compile Include="CatiaDataExtractor.vb" />
-    <Compile Include="ComCleaner.vb" />
-    <Compile Include="ExcelDataInjector.vb" />
-    <Compile Include="ExcelFormatter.vb" />
-    <Compile Include="ExcelSession.vb" />
     <Compile Include="Form1.vb">
       <SubType>Form</SubType>
     </Compile>
@@ -105,7 +100,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="PwrProduct.vb" />
     <Compile Include="Program.vb" />
   </ItemGroup>
   <ItemGroup>
@@ -201,6 +195,10 @@
     <ProjectReference Include="..\CATIAClassLibrary\CATIAClassLibrary.vbproj">
       <Project>{76122fd1-af7d-421d-83c6-33bc00d73b9b}</Project>
       <Name>CATIAClassLibrary</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\EXCELClassLibrary\EXCELClassLibrary.vbproj">
+      <Project>{9d8dc3c6-5ea9-4635-b3c9-6487e08a3004}</Project>
+      <Name>EXCELClassLibrary</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />

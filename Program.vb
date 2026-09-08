@@ -1,15 +1,14 @@
-﻿
-Option Explicit On
+﻿Option Explicit On
 Option Strict On
 Imports CATIAClassLibrary
+Imports EXCELClassLibrary
 
 Module Program
 
     Sub Main()
 
-        ' Inicio
-        Console.WriteLine(">>> Starting Process...")
 
+        Console.WriteLine(">>> Starting Process...")
 
 
         ' Catia
@@ -23,9 +22,8 @@ Module Program
 
 
 
-
         ' Excel
-        Dim oExcelSession As New ExcelSession()
+        Dim oExcelSession As New ExcelSession
         Dim oWorkbook As Microsoft.Office.Interop.Excel.Workbook = oExcelSession.CreateNewWorkbook()
         Dim oSheets As Microsoft.Office.Interop.Excel.Sheets = oWorkbook.Sheets
         Dim oSheet As Microsoft.Office.Interop.Excel.Worksheet = CType(oSheets.Item(1), Microsoft.Office.Interop.Excel.Worksheet)
@@ -44,7 +42,26 @@ Module Program
 
 
         ' Extraer de CATIA
-        Dim oCatiaData As Dictionary(Of String, PwrProduct)
+        'Dim oCatiaData As Dictionary(Of String, PwrProduct)
+        'Dim oCatiaDataextractor As New CatiaDataExtractor
+        'Dim addImages As Boolean = True
+        'oCatiaData = oCatiaDataextractor.ExtractData(oProduct, folderPath, addImages)
+
+        ' Extraer de CATIA
+        'Dim oCatiaData As Dictionary(Of String, (FullPath As String, FileName As String, ImageFilePath As String, Product As ProductStructureTypeLib.Product, Quantity As Integer, Level As Integer, ProductType As String, Source As ProductStructureTypeLib.CatProductSource))
+
+        Dim oCatiaData As Dictionary(Of String, (FullPath As String,
+                                         FileName As String,
+                                         ImageFilePath As String,
+                                         PartNumber As String,
+                                         DescriptionRef As String,
+                                         Nomenclature As String,
+                                         Definition As String,
+                                         Quantity As Integer,
+                                         Level As Integer,
+                                         ProductType As String,
+                                         Source As Integer))
+
         Dim oCatiaDataextractor As New CatiaDataExtractor
         Dim addImages As Boolean = True
         oCatiaData = oCatiaDataextractor.ExtractData(oProduct, folderPath, addImages)
@@ -65,9 +82,9 @@ Module Program
 
 
         ' Limpieza
-        Dim oCleaner As New ComCleaner()
-        oCleaner.CleanExcel(oExcelSession.Application, oExcelSession.Workbooks, oExcelSession.Workbook, oSheets, oSheet)
-        oCleaner.CleanCatia(CATIAsession.Application, CType(oProduct.ReferenceProduct.Parent, INFITF.Document), oProduct, oCatiaData)
+        'Dim oCleaner As New ComCleaner()
+        'oCleaner.CleanExcel(oExcelSession.Application, oExcelSession.Workbooks, oExcelSession.Workbook, oSheets, oSheet)
+        'oCleaner.CleanCatia(CATIAsession.Application, CType(oProduct.ReferenceProduct.Parent, INFITF.Document), oProduct, oCatiaData)
 
 
 
