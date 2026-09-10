@@ -7,7 +7,6 @@ Module Program
 
     Sub Main()
 
-
         Console.WriteLine(">>> Starting Process...")
 
 
@@ -21,13 +20,11 @@ Module Program
         CATIAsession.Application.DisplayFileAlerts = False
 
 
-
         ' Excel
         Dim oExcelSession As New ExcelSession
         Dim oWorkbook As Microsoft.Office.Interop.Excel.Workbook = oExcelSession.CreateNewWorkbook()
         Dim oSheets As Microsoft.Office.Interop.Excel.Sheets = oWorkbook.Sheets
         Dim oSheet As Microsoft.Office.Interop.Excel.Worksheet = CType(oSheets.Item(1), Microsoft.Office.Interop.Excel.Worksheet)
-
 
 
 
@@ -42,14 +39,6 @@ Module Program
 
 
         ' Extraer de CATIA
-        'Dim oCatiaData As Dictionary(Of String, PwrProduct)
-        'Dim oCatiaDataextractor As New CatiaDataExtractor
-        'Dim addImages As Boolean = True
-        'oCatiaData = oCatiaDataextractor.ExtractData(oProduct, folderPath, addImages)
-
-        ' Extraer de CATIA
-        'Dim oCatiaData As Dictionary(Of String, (FullPath As String, FileName As String, ImageFilePath As String, Product As ProductStructureTypeLib.Product, Quantity As Integer, Level As Integer, ProductType As String, Source As ProductStructureTypeLib.CatProductSource))
-
         Dim oCatiaData As Dictionary(Of String, (FullPath As String,
                                          FileName As String,
                                          ImageFilePath As String,
@@ -81,15 +70,14 @@ Module Program
         oExcelSession.Workbook.SaveAs(excelFileName)
 
 
+
         ' Limpieza
         'Dim oCleaner As New ComCleaner()
         'oCleaner.CleanExcel(oExcelSession.Application, oExcelSession.Workbooks, oExcelSession.Workbook, oSheets, oSheet)
         'oCleaner.CleanCatia(CATIAsession.Application, CType(oProduct.ReferenceProduct.Parent, INFITF.Document), oProduct, oCatiaData)
 
 
-
         Console.WriteLine(">>> Finished Successfully at " & DateTime.Now.ToString("HH:mm:ss"))
-
 
 
     End Sub
