@@ -101,6 +101,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="Program.vb" />
+    <Compile Include="Program2.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Form1.resx">
@@ -163,6 +164,15 @@
       <Isolated>False</Isolated>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
+    <COMReference Include="NavigatorTypeLib">
+      <Guid>{E6BCB304-3260-11D4-9465-006094EB3826}</Guid>
+      <VersionMajor>0</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
     <COMReference Include="Office">
       <Guid>{2DF8D04C-5BFA-101B-BDE5-00AA0044DE52}</Guid>
       <VersionMajor>2</VersionMajor>
@@ -199,6 +209,10 @@
     <ProjectReference Include="..\EXCELClassLibrary\EXCELClassLibrary.vbproj">
       <Project>{9d8dc3c6-5ea9-4635-b3c9-6487e08a3004}</Project>
       <Name>EXCELClassLibrary</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SubProcessTracer\SubProcessTracer\SubProcessTracer.vbproj">
+      <Project>{f991884f-3950-4241-8f13-97074e00dc18}</Project>
+      <Name>SubProcessTracer</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
